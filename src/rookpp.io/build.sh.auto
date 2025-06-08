@@ -1,0 +1,14 @@
+DIRECTORY = /home/zac21/BlackRookGames/cpp/rookpp/src/rookpp.io
+
+all: \
+$(DIRECTORY)/source/rookpp.io.BinReader.-methods.cpp \
+$(DIRECTORY)/source/rookpp.io.BinWriter.-methods.cpp
+	 @echo >>/dev/null
+
+$(DIRECTORY)/source/rookpp.io.BinReader.-methods.cpp: $(DIRECTORY)/source/rookpp.io.BinReader.-methods.cpp.sh
+	@echo -e "\t$(DIRECTORY)/source/rookpp.io.BinReader.-methods.cpp"
+	@sh "$(DIRECTORY)/source/rookpp.io.BinReader.-methods.cpp.sh" "$(DIRECTORY)/source/rookpp.io.BinReader.-methods.cpp"
+
+$(DIRECTORY)/source/rookpp.io.BinWriter.-methods.cpp: $(DIRECTORY)/source/rookpp.io.BinWriter.-methods.cpp.sh
+	@echo -e "\t$(DIRECTORY)/source/rookpp.io.BinWriter.-methods.cpp"
+	@sh "$(DIRECTORY)/source/rookpp.io.BinWriter.-methods.cpp.sh" "$(DIRECTORY)/source/rookpp.io.BinWriter.-methods.cpp"
