@@ -60,18 +60,6 @@ getLines() {
     fi
 }
 
-removeAssociated() {
-    local dir=$1
-    local ext1=$2
-    local ext2=$3
-    local paths=
-    mapfile -t paths <<< "$(find "$dir" -type f -name "*$ext1")"
-    local path
-    for path in "${paths[@]}"; do
-        rm -fr "${path%$ext1}$ext2"
-    done
-}
-
 #Get OS info
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     os_ext_app=""
@@ -99,8 +87,6 @@ if [ "$target" = "clean" ]; then
     done
     rm -fr "$binDir"
     rm -fr "$makDir"
-    removeAssociated . ".h.sh" ".h"
-    removeAssociated . ".cpp.sh" ".cpp"
     exit 
 fi
 
@@ -112,17 +98,6 @@ fi
 
 #Build
 mkdir -p "$makDir"
-#Auto
-makAuto="$makDir/auto"
-if [ ! -f "$makAuto" ]; then
-    echo "EXT := \$(word 1,\$(MAKECMDGOALS))" >>"$makAuto"
-    echo "INEXT := \$(EXT).sh" >>"$makAuto"
-    echo "OUTEXT := \$(EXT)" >>"$makAuto"
-    echo "\$(EXT): \$(foreach path,\$(wildcard \$(CURDIR)/*\$(INEXT)),\$(path:\$(INEXT)=\$(OUTEXT)));" >>"$makAuto"
-    echo "%\$(OUTEXT): %\$(INEXT)" >>"$makAuto"
-    echo "	@echo \$@" >>"$makAuto"
-    echo "	@bash \$< \$@" >>"$makAuto"
-fi
 #Make
 makMake="$makDir/make"
 if [ ! -f "$makMake" ]; then
@@ -193,11 +168,6 @@ for i in "${!libs[@]}"; do
         echo "" >>"$lib_bin_deps"
         echo "echo \"\"" >>"$lib_depsDest"
     fi
-    #Auto
-    lib_autoLog="$makDir/$lib.auto.log"
-    rm -fr "$lib_autoLog"
-    make --no-print-directory -C "$lib_dir/header" -f "$makAuto" ".h" &>>"$lib_autoLog"
-    make --no-print-directory -C "$lib_dir/source" -f "$makAuto" ".cpp" &>>"$lib_autoLog"
     #Headers
     cp -u $lib_dir/header/*.h "$lib_bin"
     #Make
