@@ -1,7 +1,6 @@
 src=$1
 rm -fr $src
 
-
 echo -e "#include <cstdio>" >>$src #TODO: Remove
 echo -e "#include \"rookpp.Parsing.h\"" >>$src
 echo -e "" >>$src

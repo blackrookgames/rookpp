@@ -1,0 +1,35 @@
+#This updates the auto files
+#Run this before before running the main makefile
+
+define find
+	$(shell \
+	for path in $$(find $1 -type f -name *$2.sh); do \
+		echo -n "$${path%.*} "; \
+	done \
+	)
+endef
+
+define autorun
+	@echo $(notdir $@)
+	@error=$$(bash $< $@ 2>&1 > /dev/null); \
+	if [ -n "$$error" ]; then \
+		echo "$$error"; \
+		rm -fr $@; \
+	fi
+endef
+
+PATHS := 
+PATHS += $(call find,$(CURDIR),.h)
+PATHS += $(call find,$(CURDIR),.cpp)
+$(info $(PATHS))
+
+all: $(PATHS);
+
+clean:
+	@rm -fr $(PATHS)
+
+%.h: %.h.sh
+	$(call autorun)
+
+%.cpp: %.cpp.sh
+	$(call autorun)

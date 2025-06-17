@@ -27,39 +27,6 @@ elif [ "$1" = "--help" ]; then
     exit
 fi
 
-getLines() {
-    local name=$1
-    local path=$2
-    local content="$(cat "$path")"
-    #Get lines
-    local array
-    mapfile -t array <<< "$content"
-    local item
-    local iteml
-    local i
-    eval "$name=()"
-    for item in "${array[@]}"; do
-        #Trim comment
-        iteml="${#item}"
-        i=0
-        while [ $i -lt $iteml ]; do
-            if [ "${item:$i:1}" = "#" ]; then
-                break
-            fi
-            i="$(expr $i + 1)"
-        done
-        item="${item:0:$i}"
-        #Trim whitespace
-        item="${item#"${item%%[![:space:]]*}"}"
-        item="${item%"${item##*[![:space:]]}"}"
-        if [ -z "$item" ]; then
-            continue
-        fi
-        #Add
-        eval "$name+=(\"$item\")"
-    done
-}
-
 #Parse input
 args=()
 argc=0
@@ -116,11 +83,9 @@ reqi="$(expr $reqi + 1)"
 
 #Get OS info
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    os_ext_app=""
-    os_ext_lib=".so"
+    os_ext_lib=".a"
 elif [[ "$OSTYPE" == "msys" ]]; then
-    os_ext_app=".exe"
-    os_ext_lib=".dll"
+    os_ext_lib=".dll" #TODO: Fix
 else
     echo "ERROR: $OSTYPE is not supported." >&2;
     exit 1
@@ -130,9 +95,11 @@ fi
 allLibs=()
 getAllLibs() {
     local libName=$1
+    local libRawPath="$binSrcDir/$libName"
+    local libLibPath="$libRawPath$os_ext_lib"
+    local libDepPath="$libRawPath.dep"
     #Ensure library exists
-    local libDir="$binSrcDir/$libName"
-    if [ ! -d "$libDir" ]; then
+    if [ ! -f "$libLibPath" ]; then
         echo "Could not find $libName." >&2
         return
     fi
@@ -149,13 +116,14 @@ getAllLibs() {
         allLibs+=("$libName")
     fi
     #Add deps
-    local depsPath="$libDir/deps"
     local deps
     local dep
-    if [ -f "$depsPath" ]; then
-        getLines deps $depsPath
+    if [ -f "$libDepPath" ]; then
+        mapfile -t deps <<<"$(bash $shDir/.getdeps.sh $libDepPath)"
         for dep in "${deps[@]}"; do
-            getAllLibs "$dep"
+            if [ -n "$dep" ]; then
+                getAllLibs "$dep"
+            fi
         done
     fi
 }
@@ -172,13 +140,15 @@ fi
 #Copy libraries
 for lib in "${allLibs[@]}"; do
     echo "$lib"
-    libDir="$binSrcDir/$lib"
+    libRawPath="$binSrcDir/$lib"
+    libLibPath="$libRawPath$os_ext_lib"
+    libHdrPath="$libRawPath.h"
     #Binaries
     if [ -n "$binDir" ]; then
-        cp -u "$libDir/$lib$os_ext_lib" "$binDir"
+        cp -u "$libLibPath" "$binDir"
     fi
     #Headers
     if [ -n "$hdrDir" ]; then
-        cp -u "$libDir"/*.h "$hdrDir"
+        cp -u "$libHdrPath" "$hdrDir"
     fi
 done

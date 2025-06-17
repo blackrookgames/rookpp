@@ -1,4 +1,2 @@
 bin/
-mak/
-src/rookpp/object/
-src/rookpp.io/object/
+obj/
