@@ -1,3 +1,16 @@
+#Get OS specific info
+OS_CMD := 
+#Is this Windows?
+ifeq ($(OS),Windows_NT)
+ifeq ($(strip $(UNIX)),)
+$(error Please set UNIX in your environment)
+endif
+OS_CMD := $(UNIX)/
+#If not, assume this is linux
+else
+OS_CMD := find
+endif
+
 ifneq ($(notdir $(CURDIR)),bin)
 
 export DIR := $(CURDIR)
@@ -12,20 +25,20 @@ export SRCSRCDIR := $(SRCDIR)/src
 LIBS := $(foreach fname,$(notdir $(wildcard $(SRCHDRDIR)/*.h)),$(fname:.h=))
 
 all:
-	@mkdir -p $(BINDIR)
+	@$(OS_CMD)mkdir -p $(BINDIR)
 	@libs=($(LIBS)); \
 	for lib in "$${libs[@]}"; do \
 		$(MAKE) --no-print-directory -C $(BINDIR) -f $(DIR)/Makefile $$lib; \
 	done
 
 clean:
-	@echo Clean
-	@rm -fr $(BINDIR) $(OBJDIR)
+	@$(OS_CMD)echo Clean
+	@$(OS_CMD)rm -fr $(BINDIR) $(OBJDIR)
 
 else
 
 LIB := $(MAKECMDGOALS)
-LIB_BPATH := $(BINDIR)/$(LIB).a #TODO: Consider Windows
+LIB_BPATH := $(BINDIR)/$(LIB).a
 #hdr
 LIB_HDRSPATH := $(SRCHDRDIR)/$(LIB).h
 LIB_HDRBPATH := $(BINDIR)/$(LIB).h
@@ -35,39 +48,39 @@ LIB_DEPBPATH := $(BINDIR)/$(LIB).dep
 #src
 LIB_SRCSDIR := $(SRCSRCDIR)/$(LIB)
 LIB_SRCSPATHS := $(shell \
-	for path in $$(find $(LIB_SRCSDIR) -type f -name *.cpp); do \
-		echo -n "$${path} "; \
+	for path in $$($(OS_CMD)find $(LIB_SRCSDIR) -type f -name *.cpp); do \
+		$(OS_CMD)echo -n "$${path} "; \
 	done )
-LIB_SRCRPATHS := $(foreach path,$(LIB_SRCSPATHS),$(shell realpath --relative-to $(SRCSRCDIR) $(path)))
+LIB_SRCRPATHS := $(foreach path,$(LIB_SRCSPATHS),$(shell $(OS_CMD)realpath --relative-to $(SRCSRCDIR) $(path)))
 LIB_SRCOPATHS := $(foreach path,$(LIB_SRCRPATHS),$(OBJDIR)/$(path:.cpp=.o))
 
 $(LIB): $(LIB_BPATH);
 
 $(LIB_BPATH): $(LIB_HDRBPATH) $(LIB_DEPBPATH) $(LIB_SRCOPATHS)
-	@echo $(notdir $@)
-	@mkdir -p $(shell dirname $@)
-	@ar rcs $(LIB_BPATH) $(LIB_SRCOPATHS) #TODO: Consider Windows
+	@$(OS_CMD)echo $(notdir $@)
+	@$(OS_CMD)mkdir -p $(shell $(OS_CMD)dirname $@)
+	@$(OS_CMD)ar rcs $(LIB_BPATH) $(LIB_SRCOPATHS)
 
 $(LIB_HDRBPATH): $(LIB_HDRSPATH)
-	@echo $(notdir $@)
-	@mkdir -p $(shell dirname $@)
-	@cp $< $@
+	@$(OS_CMD)echo $(notdir $@)
+	@$(OS_CMD)mkdir -p $(shell $(OS_CMD)dirname $@)
+	@$(OS_CMD)cp $< $@
 
 $(LIB_DEPBPATH): $(LIB_DEPSPATH)
-	@echo $(notdir $@)
-	@mkdir -p $(shell dirname $@)
+	@$(OS_CMD)echo $(notdir $@)
+	@$(OS_CMD)mkdir -p $(shell $(OS_CMD)dirname $@)
 	@if [ -f $< ]; then \
-		cp "$<" "$@"; \
+		$(OS_CMD)cp "$<" "$@"; \
 	else \
-		rm -fr "$@" ; \
-		echo "#$(LIB) does not contain any dependencies" >>"$@" ; \
+		$(OS_CMD)rm -fr "$@" ; \
+		$(OS_CMD)echo "#$(LIB) does not contain any dependencies" >>"$@" ; \
 	fi
 
 $(LIB_DEPSPATH): ;
 
 $(OBJDIR)/%.o: $(SRCSRCDIR)/%.cpp
-	@echo $(notdir $@)
-	@mkdir -p $(shell dirname $@)
-	@g++ -c -g -o $@ $< -I$(BINDIR)
+	@$(OS_CMD)echo $(notdir $@)
+	@$(OS_CMD)mkdir -p $(shell dirname $@)
+	@$(OS_CMD)g++ -c -g -o $@ $< -I$(BINDIR)
 
 endif

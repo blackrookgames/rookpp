@@ -1,3 +1,13 @@
+# Requirements
+This project requires the following:
+- g++
+- ar
+- make
+### Note About Windows
+To use on Windows, you must have a system environment variable named UNIX.
+The value of UNIX needs to be a Unix-formatted path that points to a directory containing Unix commands
+(example "/C/msys64/usr/bin").
+
 # Quick start
 After cloning this repository, run <pre>make -f Autofile</pre> to update the auto files.
 

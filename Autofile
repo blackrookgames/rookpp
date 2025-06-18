@@ -1,32 +1,44 @@
 #This updates the auto files
 #Run this before before running the main makefile
 
+#Get OS specific info
+OS_CMD := 
+#Is this Windows?
+ifeq ($(OS),Windows_NT)
+ifeq ($(strip $(UNIX)),)
+$(error Please set UNIX in your environment)
+endif
+OS_CMD := $(UNIX)/
+#If not, assume this is linux
+else
+OS_CMD := find
+endif
+
 define find
 	$(shell \
-	for path in $$(find $1 -type f -name *$2.sh); do \
-		echo -n "$${path%.*} "; \
+	for path in $$($(OS_CMD)find $1 -type f -name *$2.sh); do \
+		$(OS_CMD)echo -n "$${path%.*} "; \
 	done \
 	)
 endef
 
 define autorun
-	@echo $(notdir $@)
+	@$(OS_CMD)echo $(notdir $@)
 	@error=$$(bash $< $@ 2>&1 > /dev/null); \
 	if [ -n "$$error" ]; then \
-		echo "$$error"; \
-		rm -fr $@; \
+		$(OS_CMD)echo "$$error"; \
+		$(OS_CMD)rm -fr $@; \
 	fi
 endef
 
 PATHS := 
 PATHS += $(call find,$(CURDIR),.h)
 PATHS += $(call find,$(CURDIR),.cpp)
-$(info $(PATHS))
 
 all: $(PATHS);
 
 clean:
-	@rm -fr $(PATHS)
+	@$(OS_CMD)rm -fr $(PATHS)
 
 %.h: %.h.sh
 	$(call autorun)

@@ -81,22 +81,12 @@ reqi=$optc
 libName="${args[$reqi]}"
 reqi="$(expr $reqi + 1)"
 
-#Get OS info
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    os_ext_lib=".a"
-elif [[ "$OSTYPE" == "msys" ]]; then
-    os_ext_lib=".dll" #TODO: Fix
-else
-    echo "ERROR: $OSTYPE is not supported." >&2;
-    exit 1
-fi
-
 #Get libraries
 allLibs=()
 getAllLibs() {
     local libName=$1
     local libRawPath="$binSrcDir/$libName"
-    local libLibPath="$libRawPath$os_ext_lib"
+    local libLibPath="$libRawPath.a"
     local libDepPath="$libRawPath.dep"
     #Ensure library exists
     if [ ! -f "$libLibPath" ]; then
@@ -141,7 +131,7 @@ fi
 for lib in "${allLibs[@]}"; do
     echo "$lib"
     libRawPath="$binSrcDir/$lib"
-    libLibPath="$libRawPath$os_ext_lib"
+    libLibPath="$libRawPath.a"
     libHdrPath="$libRawPath.h"
     #Binaries
     if [ -n "$binDir" ]; then
