@@ -8,7 +8,7 @@ endif
 OS_CMD := $(UNIX)/
 #If not, assume this is linux
 else
-OS_CMD := find
+OS_CMD :=
 endif
 
 ifneq ($(notdir $(CURDIR)),bin)
