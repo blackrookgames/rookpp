@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/zac21/BlackRookGames/github/rookpp/test/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/test.dir/includes_CXX.rsp  -DDEBUG -g -std=gnu++17 -o CMakeFiles\\test.dir\\main.cpp.obj -c C:\\Users\\zac21\\BlackRookGames\\github\\rookpp\\test\\main.cpp",
+  "file": "C:/Users/zac21/BlackRookGames/github/rookpp/test/main.cpp",
+  "output": "CMakeFiles/test.dir/main.cpp.obj"
+}
+]
