@@ -35,6 +35,12 @@ set(src ${src}
     hdr${dir}/ConstBitPnt.h src${dir}/ConstBitPnt.cpp 
     hdr${dir}/ConstBitPtr.h src${dir}/ConstBitPtr.cpp)
 
+set(dir /collection)
+set(src ${src} 
+    hdr${dir}/AttachableList.h
+    hdr${dir}/AttachableListConstIterator.h
+    hdr${dir}/AttachableListIterator.h)
+
 set(dir /collection/voidptr)
 set(src ${src} 
     hdr${dir}/VoidPtrConstIterator.h src${dir}/VoidPtrConstIterator.cpp 
@@ -48,6 +54,18 @@ set(src ${src}
     hdr${dir}/VoidPtrSegColIterator.h src${dir}/VoidPtrSegColIterator.cpp 
     hdr${dir}/VoidPtrSegColSegment.h src${dir}/VoidPtrSegColSegment.cpp 
     hdr${dir}/VoidPtrStack.h src${dir}/VoidPtrStack.cpp)
+
+set(dir /ramen)
+set(src ${src} 
+    hdr${dir}/DataReader.h src${dir}/DataReader.cpp
+    hdr${dir}/DataWriter.h src${dir}/DataWriter.cpp
+    hdr${dir}/Serializable.h
+    hdr${dir}/SmartReader.h src${dir}/SmartReader.cpp
+    hdr${dir}/SmartWriter.h src${dir}/SmartWriter.cpp)
+
+set(dir /ramen/huffman)
+set(src ${src} 
+    hdr${dir}/HuffmanTree.h src${dir}/HuffmanTree.cpp)
 
 add_library(rookxx SHARED ${src})
 target_include_directories(rookxx PUBLIC hdr)
