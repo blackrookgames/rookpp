@@ -5,6 +5,11 @@
 			"name": "rookxx",
 			"path": "./rookxx"
 		},
+		// rookxx.ioutil
+		{
+			"name": "rookxx.ioutil",
+			"path": "./rookxx.ioutil"
+		},
 		// test
 		{
 			"name": "test",
