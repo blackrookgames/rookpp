@@ -1,6 +1,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "ramen/huffman/HuffmanLeaf.h"
+#include "ramen/huffman/HuffmanParent.h"
 #include "ramen/Serializable.h"
 
 #ifndef rookxx_ramen_huffman_HuffmanTree_h
@@ -42,6 +44,21 @@ namespace rookxx::ramen::huffman
         /// @param size Size of serialized byte data
         /// @return Whether or not successful
         public: virtual bool deserialize(const uint8_t* data, size_t size) override;
+
+        #pragma endregion
+
+        #pragma region fields
+
+        private: HuffmanParent f_Root;
+
+        #pragma endregion
+
+        #pragma region properties
+
+        /// @brief Root node
+        public: HuffmanParent& root();
+        /// @brief Root node
+        public: const HuffmanParent& root() const;
 
         #pragma endregion
     };

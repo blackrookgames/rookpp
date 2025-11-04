@@ -65,6 +65,10 @@ set(src ${src}
 
 set(dir /ramen/huffman)
 set(src ${src} 
+    hdr${dir}/HuffmanLeaf.h src${dir}/HuffmanLeaf.cpp
+    hdr${dir}/HuffmanNode.h src${dir}/HuffmanNode.cpp
+    hdr${dir}/HuffmanNodeType.h
+    hdr${dir}/HuffmanParent.h src${dir}/HuffmanParent.cpp
     hdr${dir}/HuffmanTree.h src${dir}/HuffmanTree.cpp)
 
 add_library(rookxx SHARED ${src})

@@ -33,6 +33,9 @@ set(rookxx_ioutil_d "${CMAKE_SOURCE_DIR}/../rookxx.ioutil")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
+set(src 
+    hdr/TreePrinter.h src/TreePrinter.cpp)
+
 add_custom_target(PreBuildSetup
     COMMAND ${CMAKE_COMMAND} -E echo "Running pre-build setup script..."
     COMMAND bash ${CMAKE_SOURCE_DIR}/CMakeLists.copy.sh 
@@ -42,7 +45,7 @@ add_custom_target(PreBuildSetup
     COMMENT "Executing pre-build setup tasks"
 )
 
-add_executable(test ${exeOptions} main.cpp)
+add_executable(test ${exeOptions} main.cpp ${src})
 add_dependencies(test PreBuildSetup)
 target_include_directories(test PUBLIC hdr)
 target_include_directories(test PUBLIC "${rookxx_d}/hdr")
