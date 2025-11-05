@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "bitman/BitPtr.h"
+#include "bitman/ConstBitPtr.h"
 #include "ramen/ArrUtil.h"
 #include "ramen/huffman/HuffmanTree_SAn.h"
 
@@ -102,6 +103,101 @@ void m_WriteChild(const HuffmanTree_SAn& san, const s_BitLens& bitLens, BitPtr& 
         while (written < bitLens.childBitLen)
         { *(bptr++) = false; ++written; }
     }
+}
+
+HuffmanTree_SAn::Child m_ReadChild(const s_BitLens& bitLens, ConstBitPtr& bptr)
+{
+    HuffmanTree_SAn::Child child = { .isParent = *(bptr++), };
+    uint8_t written = 1;
+    if (child.isParent)
+    {
+        // Index
+        {
+            child.valInd = 0;
+            size_t mask = 1 << (bitLens.largestPGenSizeBitLen - 1);
+            for (uint8_t j = 0; j < bitLens.largestPGenSizeBitLen; j++)
+            {
+                if (*(bptr++)) child.valInd |= mask;
+                mask >>= 1;
+            }
+        }
+        written += bitLens.largestPGenSizeBitLen;
+        // Fill
+        while (written < bitLens.childBitLen)
+        { ++bptr; ++written; }
+    }
+    else
+    {
+        // Value
+        {
+            child.valInd = 0;
+            size_t mask = 1 << (bitLens.leafValBitLen - 1);
+            for (uint8_t j = 0; j < bitLens.leafValBitLen; j++)
+            {
+                if (*(bptr++)) child.valInd |= mask;
+                mask >>= 1;
+            }
+        }
+        written += bitLens.leafValBitLen;
+        // Frequency
+        {
+            child.freq = 0;
+            size_t mask = 1 << (bitLens.leafFrqBitLen - 1);
+            for (uint8_t j = 0; j < bitLens.leafFrqBitLen; j++)
+            {
+                if (*(bptr++)) child.freq |= mask;
+                mask >>= 1;
+            }
+        }
+        written += bitLens.leafFrqBitLen;
+        // Fill
+        while (written < bitLens.childBitLen)
+        { ++bptr; ++written; }
+    }
+    return child;
+}
+
+void m_BuildParent(
+    HuffmanParent& parent, 
+    const HuffmanTree_SAn::Parent* parentNodes, 
+    size_t numPGens, const size_t* pGenOffsets, const size_t* pGenSizes, 
+    size_t pgen = 0, size_t index = 0)
+{
+    // Get info
+    HuffmanTree_SAn::Parent p = parentNodes[pGenOffsets[pgen] + index];
+    size_t nextgen = pgen + 1;
+    // Child 0
+    HuffmanNode* child0 = nullptr;
+    if (p.child0.isParent)
+    {
+        if (nextgen < numPGens && p.child0.valInd < pGenSizes[nextgen])
+        {
+            HuffmanParent* newParent = new HuffmanParent();
+            m_BuildParent(*newParent, parentNodes, numPGens, pGenOffsets, pGenSizes, nextgen, p.child0.valInd);
+            child0 = newParent;
+        }
+    }
+    else
+    {
+        child0 = new HuffmanLeaf((uint8_t)(p.child0.valInd & 0xFF), p.child0.freq);
+    }
+    parent.setChild0(child0);
+    // Child 1
+    HuffmanNode* child1 = nullptr;
+    if (p.child1.isParent)
+    {
+        if (nextgen < numPGens && p.child1.valInd < pGenSizes[nextgen])
+        {
+            HuffmanParent* newParent = new HuffmanParent();
+            m_BuildParent(*newParent, parentNodes, numPGens, pGenOffsets, pGenSizes, nextgen, p.child1.valInd);
+            child1 = newParent;
+        }
+    }
+    else
+    {
+        child1 = new HuffmanLeaf((uint8_t)(p.child1.valInd & 0xFF), p.child1.freq);
+    }
+    parent.setChild1(child1);
 }
 
 #pragma endregion
@@ -213,7 +309,83 @@ bool HuffmanTree::deserialize(const uint8_t* data, size_t size)
 {
     f_Root.setChild0(nullptr);
     f_Root.setChild1(nullptr);
-    return false;
+    const uint8_t* iptr = data;
+    const uint8_t* iend = data + size;
+    // Read bit lengths
+    size_t size_BitLenHeader = mc_Size_BitLenHeader;
+        if ((iend - iptr) < size_BitLenHeader) return false;
+        s_BitLens bitLens =
+    {
+        .numPGensBitLen = *(iptr++),
+        .largestPGenSizeBitLen = *(iptr++),
+        .leafValBitLen = *(iptr++),
+        .leafFrqBitLen = *(iptr++),
+    };
+    bitLens.childBitLen = mc_ChildBitLen(
+        bitLens.largestPGenSizeBitLen, 
+        bitLens.leafValBitLen, 
+        bitLens.leafFrqBitLen);
+    if (bitLens.numPGensBitLen == 0) return true; // No parent generations to extract; just return as successful
+    // Read number of parent generations
+    size_t size_NumPGens = mc_Size_NumPGens(bitLens.numPGensBitLen);
+        if ((iend - iptr) < size_NumPGens) return false;
+        size_t numPGens = 0;
+    {
+        ConstBitPtr bptr = iptr;
+        size_t mask = 1 << (bitLens.numPGensBitLen - 1);
+        for (uint8_t i = 0; i < bitLens.numPGensBitLen; i++)
+        {
+            if (*(bptr++))
+                numPGens |= mask;
+            mask >>= 1;
+        }
+    }
+    iptr += size_NumPGens;
+    // Read generation sizes
+    size_t size_PGenSizes = mc_Size_PGenSizes(numPGens, bitLens.largestPGenSizeBitLen);
+        if ((iend - iptr) < size_PGenSizes) return false;
+        size_t pGenOffsets[numPGens];
+    size_t pGenSizes[numPGens];
+    size_t numParents = 0;
+    {
+        ConstBitPtr bptr = iptr;
+        size_t* offptr = pGenOffsets;
+        size_t* sizptr = pGenSizes;
+        for (size_t i = 0; i < numPGens; i++)
+        {
+            *sizptr = 0;
+            size_t mask = 1 << (bitLens.largestPGenSizeBitLen - 1);
+            for (uint8_t j = 0; j < bitLens.largestPGenSizeBitLen; j++)
+            {
+                if (*(bptr++))
+                    *sizptr |= mask;
+                mask >>= 1;
+            }
+            *(offptr++) = numParents;
+            numParents += *(sizptr++);
+        }
+    }
+    iptr += size_PGenSizes;
+    // Parent nodes
+    size_t size_ParentNodes = mc_Size_ParentNodes(numParents, bitLens.childBitLen);
+        if ((iend - iptr) < size_ParentNodes) return false;
+    HuffmanTree_SAn::Parent parentNodes[numParents];
+    {
+        ConstBitPtr bptr = iptr;
+        HuffmanTree_SAn::Parent* parptr = parentNodes;
+        for (size_t i = 0; i < numParents; i++)
+        {
+            HuffmanTree_SAn::Parent parent;
+            parent.child0 = m_ReadChild(bitLens, bptr);
+            parent.child1 = m_ReadChild(bitLens, bptr);
+            *(parptr++) = parent;
+        }
+    }
+    iptr += size_ParentNodes;
+    // Build tree
+    m_BuildParent(f_Root, parentNodes, numPGens, pGenOffsets, pGenSizes);
+    // Success!!!
+        return true;
 }
 
 #pragma endregion

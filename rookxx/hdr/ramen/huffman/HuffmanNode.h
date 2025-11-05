@@ -15,6 +15,10 @@ namespace rookxx::ramen::huffman
     /// @brief Represents a node within a Huffman-style node tree
     class HuffmanNode
     {
+        // TODO: Allow nodes to be deleted by tree to prevent memory leaks
+        // When tree is loading new data
+        // When tree is being deleted
+
         #pragma region init
 
         /// @brief Constructor for HuffmanNode
