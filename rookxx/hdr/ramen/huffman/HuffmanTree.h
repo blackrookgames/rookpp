@@ -34,6 +34,16 @@ namespace rookxx::ramen::huffman
         /// @brief Attempts to serialize the Huffman-style node tree
         /// @param data Serialized byte data
         /// @param size Size of serialized byte data
+        /// @param excludeFreq Whether or not frequencies are to be excluded in serialized data; 
+        /// exclusion may be ideal for data compression
+        /// @return Whether or not successful
+        /// @note If serialization fails, data will be set to nullptr
+        /// @note If serialization fails, size will be set to zero
+        public: bool serialize(uint8_t*& data, size_t& size, bool excludeFreq) const;
+
+        /// @brief Attempts to serialize the Huffman-style node tree
+        /// @param data Serialized byte data
+        /// @param size Size of serialized byte data
         /// @return Whether or not successful
         /// @note If serialization fails, data will be set to nullptr
         /// @note If serialization fails, size will be set to zero

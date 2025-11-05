@@ -23,9 +23,26 @@ int main(int argc, char** argv)
     int exit = 1;
     // Create tree
     huffman::HuffmanTree tree;
+    huffman::HuffmanParent parent0;
+    tree.root().setChild0(&parent0);
+    huffman::HuffmanLeaf leaf00(4, 5);
+    parent0.setChild0(&leaf00);
+    huffman::HuffmanLeaf leaf01(8, 10);
+    parent0.setChild1(&leaf01);
+    huffman::HuffmanParent parent1;
+    tree.root().setChild1(&parent1);
+    huffman::HuffmanLeaf leaf10(12, 15);
+    parent1.setChild0(&leaf10);
+    huffman::HuffmanLeaf leaf11(16, 20);
+    parent1.setChild1(&leaf11);
     // Save tree
-    if (!rookxx::ioutil::IO::save(output, tree, std::ios::binary))
-        goto finish;
+    {
+        uint8_t* data;
+        size_t size;
+        tree.serialize(data, size, false);
+        if (!rookxx::ioutil::IO::save(output, data, size, std::ios::binary))
+            goto finish;
+    }
     // Load tree
     if (!rookxx::ioutil::IO::load(output, tree, std::ios::binary))
         goto finish;
