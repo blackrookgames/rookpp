@@ -1,7 +1,5 @@
 #include "ramen/huffman/HuffmanParent.h"
 
-#include <iostream>
-
 using namespace rookxx::ramen::huffman;
 
 #pragma region init

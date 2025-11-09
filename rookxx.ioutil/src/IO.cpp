@@ -196,7 +196,7 @@ bool IO::save(const std::filesystem::path& path, const rookxx::ramen::Serializab
     if (!serializable.serialize(data, size))
         return false;
     // Save serialized data
-    bool success = serializable.serialize(data, size);
+    bool success = save(path, data, size, mode);
     if (data) delete[] data;
     return success;
 }

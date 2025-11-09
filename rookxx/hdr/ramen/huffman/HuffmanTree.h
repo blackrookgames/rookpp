@@ -3,7 +3,7 @@
 
 #include "ramen/huffman/HuffmanLeaf.h"
 #include "ramen/huffman/HuffmanParent.h"
-#include "ramen/Serializable.h"
+#include "ramen/SmartSerializable.h"
 
 #ifndef rookxx_ramen_huffman_HuffmanTree_h
 #define rookxx_ramen_huffman_HuffmanTree_h
@@ -11,7 +11,7 @@
 namespace rookxx::ramen::huffman
 {
     /// @brief Represents a serializable Huffman-style node tree
-    class HuffmanTree : public Serializable
+    class HuffmanTree : public SmartSerializable
     {
         #pragma region init
 
@@ -55,6 +55,26 @@ namespace rookxx::ramen::huffman
         /// @return Whether or not successful
         public: virtual bool deserialize(const uint8_t* data, size_t size) override;
 
+        /// @brief Attempts to serialize the Huffman-style node tree
+        /// @param sw Smart writer
+        /// @param excludeFreq Whether or not frequencies are to be excluded in serialized data; 
+        /// exclusion may be ideal for data compression
+        /// @return Whether or not successful
+        /// @note If serialization fails, writer position will not be changed
+        public: bool serialize(SmartWriter& sw, bool excludeFreq) const;
+
+        /// @brief Attempts to serialize the Huffman-style node tree
+        /// @param sw Smart writer
+        /// @return Whether or not successful
+        /// @note If serialization fails, writer position will not be changed
+        public: virtual bool serialize(SmartWriter& sw) const override;
+        
+        /// @brief Attempts to the Huffman-style node tree by deserializing byte data
+        /// @param sr Smart reader
+        /// @return Whether or not successful
+        /// @note If serialization fails, reader position will not be changed
+        public: virtual bool deserialize(SmartReader& sr) override;
+        
         #pragma endregion
 
         #pragma region fields

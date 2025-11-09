@@ -62,6 +62,7 @@ set(src ${src}
     hdr${dir}/DataWriter.h src${dir}/DataWriter.cpp
     hdr${dir}/Serializable.h
     hdr${dir}/SmartReader.h src${dir}/SmartReader.cpp
+    hdr${dir}/SmartSerializable.h
     hdr${dir}/SmartWriter.h src${dir}/SmartWriter.cpp)
 
 set(dir /ramen/huffman)
@@ -71,7 +72,8 @@ set(src ${src}
     hdr${dir}/HuffmanNodeType.h
     hdr${dir}/HuffmanParent.h src${dir}/HuffmanParent.cpp
     hdr${dir}/HuffmanTree.h src${dir}/HuffmanTree.cpp
-    hdr${dir}/HuffmanTree_SAn.h src${dir}/HuffmanTree_SAn.cpp)
+    hdr${dir}/HuffmanTree_SAn.h src${dir}/HuffmanTree_SAn.cpp
+    hdr${dir}/HuffmanUtility.h src${dir}/HuffmanUtility.cpp)
 
 add_library(rookxx SHARED ${src})
 target_include_directories(rookxx PUBLIC hdr)

@@ -36,7 +36,7 @@ namespace rookxx::ramen::huffman
 
         // We won't need these
         public: HuffmanParent(const HuffmanParent& src) = delete;
-        public: HuffmanParent(HuffmanParent&& src) = delete;
+        private: HuffmanParent(HuffmanParent&& src) = delete;
         public: HuffmanParent& operator=(const HuffmanParent& src) = delete;
         public: HuffmanParent& operator=(HuffmanParent&& src) = delete;
 

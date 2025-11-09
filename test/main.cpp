@@ -51,11 +51,13 @@ void countOccurances(const uint8_t* data, size_t size, size_t*& occurances)
 
 int main(int argc, char** argv)
 {
-    if (argc < 2)
+    if (argc < 3)
     {
-        std::cout << *argv << " <string>" << std::endl;
+        std::cout << *argv << " <string> <output>" << std::endl;
         return 0;
     }
+
+    std::filesystem::path output(argv[2]);
 
     uint8_t* idata = nullptr;
     size_t isize = 0;
@@ -133,9 +135,16 @@ int main(int argc, char** argv)
                 queue.clear();
             }
         }
+        // Save tree
+        if (!rookxx::ioutil::IO::save(output, tree, std::ios::binary))
+            goto fail;
+        // Load tree
+        if (!rookxx::ioutil::IO::load(output, tree, std::ios::binary))
+            goto fail;
         // Print tree
         TreePrinter::run(tree, true);
     }
+fail:
     if (occurances) delete[] occurances;
     if (idata) delete[] idata;
     return 0;
