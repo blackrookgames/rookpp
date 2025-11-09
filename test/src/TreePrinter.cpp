@@ -6,7 +6,7 @@
 
 namespace huffman = rookxx::ramen::huffman;
 
-void TreePrinter::run(const huffman::HuffmanTree& tree)
+void TreePrinter::run(const huffman::HuffmanTree& tree, bool printChars)
 {
     // Get depth
     size_t depth = m_GetDepth(tree.root());
@@ -64,8 +64,15 @@ void TreePrinter::run(const huffman::HuffmanTree& tree)
                 {
                     const huffman::HuffmanLeaf& leaf = *static_cast<const huffman::HuffmanLeaf*>(cell);
                     uint8_t value = leaf.value();
-                    for (size_t xx = 0; xx < 8; xx++)
-                        yptr[2 + xx] = '0' + (char)((value >> (7 - xx)) & 1);
+                    if (printChars)
+                    {
+                        yptr[nodeW - 3] = (char)value;
+                    }
+                    else
+                    {
+                        for (size_t xx = 0; xx < 8; xx++)
+                            yptr[2 + xx] = '0' + (char)((value >> (7 - xx)) & 1);
+                    }
                 }
                 yptr += printW;
                 // Bottom
