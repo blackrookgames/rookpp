@@ -172,14 +172,14 @@ void m_BuildParent(
     {
         if (nextgen < numPGens && p.child0.valInd < pGenSizes[nextgen])
         {
-            HuffmanParent* newParent = new HuffmanParent();
+            HuffmanParent* newParent = new HuffmanParent(true);
             m_BuildParent(*newParent, parentNodes, numPGens, pGenOffsets, pGenSizes, nextgen, p.child0.valInd);
             child0 = newParent;
         }
     }
     else
     {
-        child0 = new HuffmanLeaf((uint8_t)(p.child0.valInd & 0xFF), p.child0.freq);
+        child0 = new HuffmanLeaf((uint8_t)(p.child0.valInd & 0xFF), p.child0.freq, true);
     }
     parent.setChild0(child0);
     // Child 1
@@ -188,14 +188,14 @@ void m_BuildParent(
     {
         if (nextgen < numPGens && p.child1.valInd < pGenSizes[nextgen])
         {
-            HuffmanParent* newParent = new HuffmanParent();
+            HuffmanParent* newParent = new HuffmanParent(true);
             m_BuildParent(*newParent, parentNodes, numPGens, pGenOffsets, pGenSizes, nextgen, p.child1.valInd);
             child1 = newParent;
         }
     }
     else
     {
-        child1 = new HuffmanLeaf((uint8_t)(p.child1.valInd & 0xFF), p.child1.freq);
+        child1 = new HuffmanLeaf((uint8_t)(p.child1.valInd & 0xFF), p.child1.freq, true);
     }
     parent.setChild1(child1);
 }

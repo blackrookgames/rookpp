@@ -1,14 +1,17 @@
 #include "ramen/huffman/HuffmanParent.h"
 
+#include <iostream>
+
 using namespace rookxx::ramen::huffman;
 
 #pragma region init
 
-HuffmanParent::HuffmanParent() : 
-    HuffmanParent(HuffmanNodeType::Branch)
+HuffmanParent::HuffmanParent(bool deleteWhenDisowned) : 
+    HuffmanParent(HuffmanNodeType::Branch, deleteWhenDisowned)
 { }
 
-HuffmanParent::HuffmanParent(HuffmanNodeType type) :
+HuffmanParent::HuffmanParent(HuffmanNodeType type, bool deleteWhenDisowned) :
+    HuffmanNode(deleteWhenDisowned),
     f_Type(type),
     f_Freq(0),
     f_Child0(nullptr),
@@ -18,8 +21,8 @@ HuffmanParent::HuffmanParent(HuffmanNodeType type) :
 HuffmanParent::~HuffmanParent()
 {
     // Unparent children
-    if (f_Child0) f_Child0->f_Parent = nullptr;
-    if (f_Child1) f_Child1->f_Parent = nullptr;
+    if (f_Child0) m_Unparent(f_Child0);
+    if (f_Child1) m_Unparent(f_Child1);
 }
 
 #pragma endregion
@@ -42,6 +45,21 @@ const HuffmanNode* HuffmanParent::child1() const { return f_Child1; }
 
 #pragma region helper
 
+void HuffmanParent::m_Parent(HuffmanNode* node, bool index)
+{
+    node->f_Parent = this;
+    node->f_Index = index;
+}
+        
+void HuffmanParent::m_Unparent(HuffmanNode* node)
+{
+    node->f_Parent = nullptr;
+    if (node->deleteWhenDisowned() && (!node->f_Deleted))
+    {
+        delete node;
+    }
+}
+
 bool HuffmanParent::m_SetChild(HuffmanNode* node, HuffmanNode*& field, bool index)
 {
     // Make sure node is valid
@@ -55,14 +73,10 @@ bool HuffmanParent::m_SetChild(HuffmanNode* node, HuffmanNode*& field, bool inde
             return false;
     }
     // Unparent current child
-    if (field) field->f_Parent = nullptr;
+    if (field) m_Unparent(field);
     // Parent new child
     field = node;
-    if (field)
-    {
-        field->f_Parent = this;
-        field->f_Index = index;
-    }
+    if (field) m_Parent(field, index);
     // Update frequency
     m_UpdateFreq();
     // Success!!!

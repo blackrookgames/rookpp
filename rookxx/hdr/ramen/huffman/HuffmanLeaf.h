@@ -14,12 +14,14 @@ namespace rookxx::ramen::huffman
         #pragma region init
 
         /// @brief Constructor for HuffmanLeaf
-        public: HuffmanLeaf();
+        /// @param deleteWhenDisowned Whether or not the node should be deleted when it's disowned by its parent
+        public: HuffmanLeaf(bool deleteWhenDisowned = false);
 
         /// @brief Constructor for HuffmanLeaf
         /// @param value Represented byte value
         /// @param freq Node frequency
-        public: HuffmanLeaf(uint8_t value, size_t freq = 0);
+        /// @param deleteWhenDisowned Whether or not the node should be deleted when it's disowned by its parent
+        public: HuffmanLeaf(uint8_t value, size_t freq = 0, bool deleteWhenDisowned = false);
         
         /// @brief Destructor for HuffmanLeaf
         public: virtual ~HuffmanLeaf() override;

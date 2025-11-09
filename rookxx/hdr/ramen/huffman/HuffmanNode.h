@@ -22,7 +22,8 @@ namespace rookxx::ramen::huffman
         #pragma region init
 
         /// @brief Constructor for HuffmanNode
-        public: HuffmanNode();
+        /// @param deleteWhenDisowned Whether or not the node should be deleted when it's disowned by its parent
+        public: HuffmanNode(bool deleteWhenDisowned);
         
         /// @brief Destructor for HuffmanNode
         public: virtual ~HuffmanNode();
@@ -43,11 +44,16 @@ namespace rookxx::ramen::huffman
 
         #pragma region fields
 
+        // Also accessed by HuffmanParent
+        private: bool f_Deleted;
+
         // Also accessed and modified by HuffmanParent
         private: HuffmanParent* f_Parent;
 
         // Also accessed and modified by HuffmanParent
         private: bool f_Index;
+
+        private: bool f_DeleteWhenDisowned;
 
         #pragma endregion
 
@@ -72,6 +78,11 @@ namespace rookxx::ramen::huffman
         /// @brief If true, the node is child node 1 of its parent
         /// @note This value is meaningless if the node does not have a parent
         public: bool index() const;
+
+        /// @brief Whether or not the node should be deleted when it's disowned by its parent
+        public: bool deleteWhenDisowned() const;
+        /// @brief Whether or not the node should be deleted when it's disowned by its parent
+        public: void deleteWhenDisowned(bool value);
 
         #pragma endregion
     };

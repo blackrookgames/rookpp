@@ -6,12 +6,14 @@ using namespace rookxx::ramen::huffman;
 
 #pragma region init
 
-HuffmanLeaf::HuffmanLeaf() : 
-    HuffmanLeaf(0, 0)
+HuffmanLeaf::HuffmanLeaf(bool deleteWhenDisowned) : 
+    HuffmanLeaf(0, 0, deleteWhenDisowned)
 { }
 
-HuffmanLeaf::HuffmanLeaf(uint8_t value, size_t freq) :
-    f_Value(value), f_Freq(freq)
+HuffmanLeaf::HuffmanLeaf(uint8_t value, size_t freq, bool deleteWhenDisowned) :
+    HuffmanNode(deleteWhenDisowned),
+    f_Value(value),
+    f_Freq(freq)
 { }
 
 HuffmanLeaf::~HuffmanLeaf()
