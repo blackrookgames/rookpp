@@ -63,12 +63,12 @@ namespace rookxx::ramen::huffman
 
         #pragma region tree
 
-        /// @brief Constructs a Huffman tree for the specified data
-        /// @param idata Data
-        /// @param isize Size of data
-        /// @return Created Huffman tree
-        /// @note This creates a tree that is optimized for encoding the specified data
-        // public: static HuffmanTree constructTree(const uint8_t* idata, size_t isize);
+        /// @brief Uses uncompressed byte data to populate a Huffman tree
+        /// @param tree Huffman tree to populate
+        /// @param idata Uncompressed byte data
+        /// @param isize Size of uncompressed byte data
+        /// @note Any existing branches and leafs will be removed from the tree
+        public: static void populateTree(HuffmanTree& tree, const uint8_t* idata, size_t isize);
 
         #pragma endregion
     };

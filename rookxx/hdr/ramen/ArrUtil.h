@@ -40,6 +40,14 @@ namespace rookxx::ramen
         {
             memset(array, 0, length * sizeof(T));
         }
+
+        /// @brief Deletes the specified array
+        /// @tparam T Element type
+        /// @param array Array
+        public: template<typename T> static void safeDelete(T* array)
+        {
+            if (array) delete[] array;
+        }
     };
 }
 

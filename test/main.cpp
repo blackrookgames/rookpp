@@ -5,6 +5,7 @@
 
 #include "ramen/ArrUtil.h"
 #include "ramen/huffman/HuffmanTree.h"
+#include "ramen/huffman/HuffmanUtility.h"
 
 #include "IO.h"
 
@@ -35,20 +36,6 @@ void extractByteData(const char* arg, uint8_t*& data, size_t& size)
     }
 }
 
-void printByteData(const uint8_t* data, size_t size)
-{
-    while (size-- > 0)
-        std::cout << *(data++);
-    std::cout << std::endl;
-}
-
-void countOccurances(const uint8_t* data, size_t size, size_t*& occurances)
-{
-    occurances = rookxx::ramen::ArrUtil::createNull<size_t>(256);
-    while (size-- > 0)
-        occurances[*(data++)] += 1;
-}
-
 int main(int argc, char** argv)
 {
     if (argc < 3)
@@ -61,91 +48,27 @@ int main(int argc, char** argv)
 
     uint8_t* idata = nullptr;
     size_t isize = 0;
-    size_t* occurances = nullptr;
+    uint8_t* odata = nullptr;
+    size_t osize = 0;
     {
         // Get input data
         extractByteData(argv[1], idata, isize);
-        // Print input data
-        printByteData(idata, isize);
-        // Count occurances
-        countOccurances(idata, isize, occurances);
-        // Create tree
-        huffman::HuffmanTree tree;
-        {
-            // Create queue
-            std::vector<huffman::HuffmanNode*> queue;
-            queue.reserve(256);
-            {
-                size_t* iptr = occurances;
-                for (size_t i = 0; i < 256; i++)
-                {
-                    if (*iptr > 0)
-                    {
-                        huffman::HuffmanLeaf* newNode = new huffman::HuffmanLeaf(
-                            (uint8_t)i, *iptr, true);
-                        auto iter = queue.begin();
-                        while (iter != queue.end())
-                        {
-                            if ((*iter)->freq() >= newNode->freq())
-                                break;
-                            ++iter;
-                        }
-                        queue.insert(iter, newNode);
-                    }
-                    ++iptr;
-                }
-            }
-            // List queue
-            for (auto iter = queue.begin(); iter != queue.end(); iter++)
-            {
-                huffman::HuffmanLeaf* leaf = static_cast<huffman::HuffmanLeaf*>(*iter);
-                std::cout << "'" << leaf->value() << "': " << leaf->freq() << std::endl;
-            }
-            // Build tree
-            if (queue.size() > 1)
-            {
-                while (queue.size() > 2)
-                {
-                    // Remove first two
-                    huffman::HuffmanNode* child0 = queue[0];
-                    huffman::HuffmanNode* child1 = queue[1];
-                    queue.erase(queue.begin());
-                    queue.erase(queue.begin());
-                    // Create new node
-                    huffman::HuffmanParent* newNode = new huffman::HuffmanParent(true);
-                    newNode->setChild0(child0);
-                    newNode->setChild1(child1);
-                    // Insert new node into queue
-                    auto iter = queue.begin();
-                    while (iter != queue.end())
-                    {
-                        if ((*iter)->freq() >= newNode->freq())
-                            break;
-                        ++iter;
-                    }
-                    queue.insert(iter, newNode);
-                }
-                tree.root().setChild0(queue[0]);
-                tree.root().setChild1(queue[1]);
-                queue.clear();
-            }
-            else if (queue.size() == 1)
-            {
-                tree.root().setChild0(queue[0]);
-                queue.clear();
-            }
-        }
         // Save tree
-        if (!rookxx::ioutil::IO::save(output, tree, std::ios::binary))
-            goto fail;
+        {
+            if (!huffman::HuffmanUtility::encode(idata, isize, odata, osize))
+                goto fail;
+            if (!rookxx::ioutil::IO::save(output, odata, osize, std::ios::binary))
+                goto fail;
+        }
         // Load tree
+        huffman::HuffmanTree tree;
         if (!rookxx::ioutil::IO::load(output, tree, std::ios::binary))
             goto fail;
         // Print tree
         TreePrinter::run(tree, true);
     }
 fail:
-    if (occurances) delete[] occurances;
+    if (odata) delete[] odata;
     if (idata) delete[] idata;
     return 0;
 }
