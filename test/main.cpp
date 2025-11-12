@@ -50,24 +50,37 @@ int main(int argc, char** argv)
     size_t isize = 0;
     uint8_t* odata = nullptr;
     size_t osize = 0;
+    uint8_t* edata = nullptr;
+    size_t esize = 0;
+    uint8_t* ddata = nullptr;
+    size_t dsize = 0;
     {
         // Get input data
         extractByteData(argv[1], idata, isize);
-        // Save tree
+        // Save
         {
             if (!huffman::HuffmanUtility::encode(idata, isize, odata, osize))
                 goto fail;
             if (!rookxx::ioutil::IO::save(output, odata, osize, std::ios::binary))
                 goto fail;
         }
-        // Load tree
+        // Load
         huffman::HuffmanTree tree;
-        if (!rookxx::ioutil::IO::load(output, tree, std::ios::binary))
+        if (!rookxx::ioutil::IO::load(output, edata, esize, std::ios::binary))
             goto fail;
-        // Print tree
-        TreePrinter::run(tree, true);
+        if (!huffman::HuffmanUtility::decode(edata, esize, ddata, dsize))
+            goto fail;
+        // Print
+        {
+            uint8_t* stop = ddata + dsize;
+            for (uint8_t* ptr = ddata; ptr < stop; ++ptr)
+                std::cout << *ptr;
+            std::cout << std::endl;
+        }
     }
 fail:
+    if (ddata) delete[] ddata;
+    if (edata) delete[] edata;
     if (odata) delete[] odata;
     if (idata) delete[] idata;
     return 0;

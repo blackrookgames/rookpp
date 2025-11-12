@@ -100,6 +100,11 @@ HuffmanNode* HuffmanParent::operator[](bool index)
     return index ? f_Child1 : f_Child0;
 }
 
+const HuffmanNode* HuffmanParent::operator[](bool index) const
+{
+    return index ? f_Child1 : f_Child0;
+}
+
 #pragma endregion
 
 #pragma region function

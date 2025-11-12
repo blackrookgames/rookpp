@@ -104,6 +104,12 @@ namespace rookxx::ramen::huffman
         /// @return If index is true, child node 1 is returned.
         public: HuffmanNode* operator[](bool index);
 
+        /// @brief Gets the child at the specified "index"
+        /// @param index Child "index"
+        /// @return If index is false, child node 0 is returned. \
+        /// @return If index is true, child node 1 is returned.
+        public: const HuffmanNode* operator[](bool index) const;
+
         #pragma endregion
 
         #pragma region function
