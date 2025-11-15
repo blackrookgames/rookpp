@@ -63,7 +63,16 @@ set(src ${src}
     hdr${dir}/Serializable.h
     hdr${dir}/SmartReader.h src${dir}/SmartReader.cpp
     hdr${dir}/SmartSerializable.h
-    hdr${dir}/SmartWriter.h src${dir}/SmartWriter.cpp)
+    hdr${dir}/SmartWriter.h src${dir}/SmartWriter.cpp
+    hdr${dir}/String8.h src${dir}/String8.cpp
+    hdr${dir}/StringTemplate.h)
+
+set(dir /ramen/datcol)
+set(src ${src} 
+    hdr${dir}/DataCollection.h src${dir}/DataCollection.cpp
+    hdr${dir}/DataCollectionDirectory.h src${dir}/DataCollectionDirectory.cpp
+    hdr${dir}/DataCollectionFile.h src${dir}/DataCollectionFile.cpp
+    hdr${dir}/DataCollectionItem.h src${dir}/DataCollectionItem.cpp)
 
 set(dir /ramen/huffman)
 set(src ${src} 

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -29,6 +30,43 @@ namespace rookxx::ramen
             if (length == 0) return nullptr;
             T* array = new T[length];
             memset(array, 0, length * sizeof(T));
+            return array;
+        }
+
+        /// @brief Creates a new array and copies data from an existing array
+        /// @tparam T Element type
+        /// @param src Source array
+        /// @param length Number of elements within the array
+        /// @return Created array (or nullptr if length = 0)
+        public: template<typename T> static T* createCopy(const T* src, size_t length)
+        {
+            if (length == 0) return nullptr;
+            T* array = new T[length];
+            {
+                const T* iptr = src;
+                T* optr = array;
+                for (size_t i = 0; i < length; ++i)
+                    *(optr++) = *(iptr++);
+            }
+            return array;
+        }
+
+        /// @brief Creates a new array and copies data from an existing array
+        /// @tparam T Element type
+        /// @param src Source array
+        /// @param length Number of elements within the new array
+        /// @param srclen Number of elements within the source array
+        /// @return Created array (or nullptr if length = 0)
+        public: template<typename T> static T* createCopy(const T* src, size_t length, size_t srclen)
+        {
+            if (length == 0) return nullptr;
+            T* array = new T[length];
+            {
+                const T* iptr = src;
+                T* optr = array;
+                for (size_t i = std::min(length, srclen); i > 0; --i)
+                    *(optr++) = *(iptr++);
+            }
             return array;
         }
 
