@@ -8,7 +8,7 @@
 namespace rookxx::ramen
 {
     /// @brief Represents a template for a string
-    /// @tparam Character type
+    /// @tparam TChar Character type
     template<typename TChar>
     class StringTemplate
     {
@@ -122,6 +122,17 @@ namespace rookxx::ramen
 
         #pragma endregion
 
+        #pragma region helper
+
+    protected:
+        
+        /// @brief Pointer to characters
+        TChar* p_Chars() { return f_Chars; }
+        /// @brief Pointer to characters
+        const TChar* p_Chars() const { return f_Chars; }
+
+        #pragma endregion
+
         #pragma region operators
 
     public:
@@ -171,9 +182,9 @@ namespace rookxx::ramen
 
         /// @brief Whether or not the current string is equal in value to the other string
         /// @param other Other string
+        /// @param insensitive Check or not to make a case-insensitive comparison
         /// @return Whether or not the current string is equal in value to the other string
-        /// @note Comparison is case sensitive
-        bool equals(const StringTemplate<TChar>& other) const
+        bool equals(const StringTemplate<TChar>& other, bool insensitive = false) const
         {
             // Check length
             if (f_Length != other.f_Length)
@@ -184,8 +195,18 @@ namespace rookxx::ramen
                 const TChar* optr = other.f_Chars;
                 for (size_t i = 0; i < f_Length; ++i)
                 {
-                    if (*(cptr++) != *(optr++))
-                        return false;
+                    TChar c = *(cptr++);
+                    TChar o = *(optr++);
+                    // Adjust if case-insensitive
+                    if (insensitive)
+                    {
+                        if (c >= 'a' && c <= 'z')
+                            c -= 'a' - 'A';
+                        if (o >= 'a' && o <= 'z')
+                            o -= 'a' - 'A';
+                    }
+                    // Compare
+                    if (c != o) return false;
                 }
             }
             // Equality!!!
@@ -194,11 +215,13 @@ namespace rookxx::ramen
 
         /// @brief Compares the current string to the other string
         /// @param other Other string
+        /// @param insensitive Check or not to make a case-insensitive comparison
         /// @return < 0: Current string precedes other string\
         /// @return = 0: Current string and other string are equal\
         /// @return > 0: Current string follows other string
-        /// @note Comparison is case sensitive
-        int compare(const StringTemplate<TChar>& other) const
+        /// @note Casing is compared in such a way that string only differ in casing are closer together
+        /// @note For example, "apple" will follow "APPLE" but precede "BANANA"
+        int compare(const StringTemplate<TChar>& other, bool insensitive = false) const
         {
             // Length comparison
             size_t minLen;
@@ -219,22 +242,123 @@ namespace rookxx::ramen
             lenCmp = 0;
             // Character comparison
         charCmp:
+            int caseCmp = 0;
             {
                 const TChar* cptr = f_Chars;
                 const TChar* optr = other.f_Chars;
                 for (size_t i = 0; i < minLen; ++i)
                 {
-                    if (*cptr < *optr) return -1;
-                    if (*cptr > *optr) return 1;
-                    ++cptr; ++optr;
+                    TChar c = *(cptr++);
+                    TChar o = *(optr++);
+                    // Case-sensitive comparison
+                    if (caseCmp == 0)
+                    {
+                        if (c < o)
+                            caseCmp = -1;
+                        else if (c > o)
+                            caseCmp = 1;
+                    }
+                    // Case-insensitive comparison
+                    if (c >= 'a' && c <= 'z')
+                        c -= 'a' - 'A';
+                    if (o >= 'a' && o <= 'z')
+                        o -= 'a' - 'A';
+                    if (c < o) return -1;
+                    if (c > o) return 1;
                 }
             }
-            // Return length comparison
-            return lenCmp;
+            if (lenCmp != 0) return lenCmp;
+            if (insensitive) return 0;
+            return caseCmp;
         }
 
         #pragma endregion
     };
+
+    #pragma region operators
+
+    /// @brief Checks if string A and string B are equal
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return True if string A and string B are equal; otherwise false
+    template<typename TChar>
+    constexpr bool operator==(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return strA.equals(strB); }
+
+    /// @brief Checks if string A and string B are not equal
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return True if string A and string B are not equal; otherwise false
+    template<typename TChar>
+    constexpr bool operator!=(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return !strA.equals(strB); }
+
+    /// @brief Checks if string A precedes string B
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return True if string A precedes string B; otherwise false
+    template<typename TChar>
+    constexpr bool operator<(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return strA.compare(strB) < 0; }
+
+    /// @brief Checks if string A precedes or is equal to string B
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return True if string A precedes or is equal to string B; otherwise false
+    template<typename TChar>
+    constexpr bool operator<=(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return strA.compare(strB) <= 0; }
+
+    /// @brief Checks if string A follows string B
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return True if string A follows string B; otherwise false
+    template<typename TChar>
+    constexpr bool operator>(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return strA.compare(strB) > 0; }
+
+    /// @brief Checks if string A follows or is equal to string B
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return True if string A follows or is equal to string B; otherwise false
+    template<typename TChar>
+    constexpr bool operator>=(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return strA.compare(strB) >= 0; }
+
+    /// @brief Combines string A and string B and returns the result
+    /// @tparam TChar Character type
+    /// @param strA String A
+    /// @param strB String B
+    /// @return Resulting string
+    template<typename TChar>
+    StringTemplate<TChar> operator+(const StringTemplate<TChar>& strA, const StringTemplate<TChar>& strB)
+    { return strA.combine(strB); }
+
+    /// @brief Appends a character to a string and returns the result
+    /// @tparam TChar Character type
+    /// @param str String
+    /// @param c Character
+    /// @return Resulting string
+    template<typename TChar>
+    StringTemplate<TChar> operator+(const StringTemplate<TChar>& str, const TChar& c)
+    { return str.append(c); }
+
+    /// @brief Prepends a character to a string and returns the result
+    /// @tparam TChar Character type
+    /// @param c Character
+    /// @param str String
+    /// @return Resulting string
+    template<typename TChar>
+    StringTemplate<TChar> operator+(const TChar& c, const StringTemplate<TChar>& str)
+    { return str.prepend(c); }
+
+    #pragma endregion
 }
 
 #endif

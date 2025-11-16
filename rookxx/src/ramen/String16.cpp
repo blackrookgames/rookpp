@@ -1,36 +1,38 @@
-#include "ramen/String8.h"
+#include "ramen/String16.h"
+
+#include <iostream>
 
 using namespace rookxx::ramen;
 
 #pragma region init
 
-String8::String8() : StringTemplate<uint8_t>()
+String16::String16() : StringTemplate<uint16_t>()
 { }
 
-String8::String8(size_t length) : StringTemplate<uint8_t>(length)
+String16::String16(size_t length) : StringTemplate<uint16_t>(length)
 { }
 
-String8::String8(const char* cstr) : StringTemplate<uint8_t>(cstr)
+String16::String16(const char* cstr) : StringTemplate<uint16_t>(cstr)
 { }
 
-String8::~String8() 
+String16::~String16() 
 { }
 
-String8::String8(const String8& src) : StringTemplate<uint8_t>(src)
+String16::String16(const String16& src) : StringTemplate<uint16_t>(src)
 { }
 
-String8::String8(String8&& src) : StringTemplate<uint8_t>(std::move(src))
+String16::String16(String16&& src) : StringTemplate<uint16_t>(std::move(src))
 { }
 
-String8& String8::operator=(const String8& src)
+String16& String16::operator=(const String16& src)
 {
-    StringTemplate<uint8_t>::operator=(src);
+    StringTemplate<uint16_t>::operator=(src);
     return *this;
 }
 
-String8& String8::operator=(String8&& src)
+String16& String16::operator=(String16&& src)
 {
-    StringTemplate<uint8_t>::operator=(std::move(src));
+    StringTemplate<uint16_t>::operator=(std::move(src));
     return *this;
 }
 
@@ -38,7 +40,7 @@ String8& String8::operator=(String8&& src)
 
 #pragma region operators
 
-String8::operator char*() const
+String16::operator char*() const
 {
     char* result = new char[length() + 1];
     char* optr = result;
@@ -52,12 +54,12 @@ String8::operator char*() const
 
 #pragma region functions
 
-String8 String8::combine(const String8& other) const
+String16 String16::combine(const String16& other) const
 {
-    const uint8_t* iptr;
+    const uint16_t* iptr;
     // Create new string
-    String8 newStr(length() + other.length());
-    uint8_t* optr = newStr.p_Chars();
+    String16 newStr(length() + other.length());
+    uint16_t* optr = newStr.p_Chars();
     // Copy from this
     iptr = p_Chars();
     for (size_t i = 0; i < length(); ++i)
@@ -70,13 +72,13 @@ String8 String8::combine(const String8& other) const
     return newStr;
 }
 
-String8 String8::append(uint8_t c) const
+String16 String16::append(uint16_t c) const
 {
     // Create new string
-    String8 newStr(length() + 1);
-    uint8_t* optr = newStr.p_Chars();
+    String16 newStr(length() + 1);
+    uint16_t* optr = newStr.p_Chars();
     // Copy from this
-    const uint8_t* iptr = p_Chars();
+    const uint16_t* iptr = p_Chars();
     for (size_t i = 0; i < length(); ++i)
         *(optr++) = *(iptr++);
     // Add character
@@ -85,15 +87,15 @@ String8 String8::append(uint8_t c) const
     return newStr;
 }
 
-String8 String8::prepend(uint8_t c) const
+String16 String16::prepend(uint16_t c) const
 {
     // Create new string
-    String8 newStr(length() + 1);
-    uint8_t* optr = newStr.p_Chars();
+    String16 newStr(length() + 1);
+    uint16_t* optr = newStr.p_Chars();
     // Add character
     *(optr++) = c;
     // Copy from this
-    const uint8_t* iptr = p_Chars();
+    const uint16_t* iptr = p_Chars();
     for (size_t i = 0; i < length(); ++i)
         *(optr++) = *(iptr++);
     // Return result

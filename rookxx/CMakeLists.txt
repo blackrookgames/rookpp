@@ -65,6 +65,7 @@ set(src ${src}
     hdr${dir}/SmartSerializable.h
     hdr${dir}/SmartWriter.h src${dir}/SmartWriter.cpp
     hdr${dir}/String8.h src${dir}/String8.cpp
+    hdr${dir}/String16.h src${dir}/String16.cpp
     hdr${dir}/StringTemplate.h)
 
 set(dir /ramen/datcol)

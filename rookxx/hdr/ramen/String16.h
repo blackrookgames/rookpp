@@ -2,47 +2,47 @@
 #include <cstdint>
 #include "ramen/StringTemplate.h"
 
-#ifndef rookxx_ramen_String8_h
-#define rookxx_ramen_String8_h
+#ifndef rookxx_ramen_String16_h
+#define rookxx_ramen_String16_h
 
 namespace rookxx::ramen
 {
-    /// @brief Represents a string with 8-bit characters
-    class String8 : public rookxx::ramen::StringTemplate<uint8_t>
+    /// @brief Represents a string with 16-bit characters
+    class String16 : public rookxx::ramen::StringTemplate<uint16_t>
     {
         #pragma region init
 
     public:
 
-        /// @brief Constructor for String8
-        String8();
+        /// @brief Constructor for String16
+        String16();
 
-        /// @brief Constructor for String8
+        /// @brief Constructor for String16
         /// @param length Length of string
-        String8(size_t length);
+        String16(size_t length);
 
-        /// @brief Constructor for String8
+        /// @brief Constructor for String16
         /// @param cstr C-style string
-        String8(const char* cstr);
+        String16(const char* cstr);
 
-        /// @brief Destructor for String8
-        virtual ~String8();
+        /// @brief Destructor for String16
+        virtual ~String16();
         
-        /// @brief Copy constructor for String8
+        /// @brief Copy constructor for String16
         /// @param src Source
-        String8(const String8& src);
+        String16(const String16& src);
         
-        /// @brief Move constructor for String8
+        /// @brief Move constructor for String16
         /// @param src Source
-        String8(String8&& src);
+        String16(String16&& src);
         
-        /// @brief Copy assignment for String8
+        /// @brief Copy assignment for String16
         /// @param src Source
-        String8& operator=(const String8& src);
+        String16& operator=(const String16& src);
         
-        /// @brief Move assignment for String8
+        /// @brief Move assignment for String16
         /// @param src Source
-        String8& operator=(String8&& src);
+        String16& operator=(String16&& src);
 
         #pragma endregion
 
@@ -62,17 +62,17 @@ namespace rookxx::ramen
         /// @brief Combines the current string with the other string and returns the result
         /// @param other Other string
         /// @return Resulting string
-        String8 combine(const String8& other) const;
+        String16 combine(const String16& other) const;
 
         /// @brief Appends the specified character to the string and returns the result
         /// @param c Character
         /// @return Resulting string
-        String8 append(uint8_t c) const;
+        String16 append(uint16_t c) const;
 
         /// @brief Prepends the specified character to the string and returns the result
         /// @param c Character
         /// @return Resulting string
-        String8 prepend(uint8_t c) const;
+        String16 prepend(uint16_t c) const;
 
         #pragma endregion
     };
@@ -84,7 +84,7 @@ namespace rookxx::ramen
     /// @param strA String A
     /// @param strB String B
     /// @return Resulting string
-    inline String8 operator+(const String8& strA, const String8& strB)
+    inline String16 operator+(const String16& strA, const String16& strB)
     { return strA.combine(strB); }
 
     /// @brief Appends a character to a string and returns the result
@@ -92,7 +92,7 @@ namespace rookxx::ramen
     /// @param str String
     /// @param c Character
     /// @return Resulting string
-    inline String8 operator+(const String8& str, const uint8_t& c)
+    inline String16 operator+(const String16& str, const uint16_t& c)
     { return str.append(c); }
 
     /// @brief Prepends a character to a string and returns the result
@@ -100,7 +100,7 @@ namespace rookxx::ramen
     /// @param c Character
     /// @param str String
     /// @return Resulting string
-    inline String8 operator+(const uint8_t& c, const String8& str)
+    inline String16 operator+(const uint16_t& c, const String16& str)
     { return str.prepend(c); }
 
     #pragma endregion
