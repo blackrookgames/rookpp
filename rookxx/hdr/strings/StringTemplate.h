@@ -1,3 +1,6 @@
+#ifndef rookxx_strings_StringTemplate_h
+#define rookxx_strings_StringTemplate_h
+
 namespace rookxx::strings
 {
     /// @brief
@@ -27,7 +30,7 @@ namespace rookxx::strings
             /// string to not be fully readable by operations that interpret the occurance of a null character as the 
             /// end of the string.
             KeepNull,
-        }
+        };
 
         #pragma endregion
 
@@ -110,7 +113,7 @@ namespace rookxx::strings
     private:
         
         TLen f_Length;
-        TChar** f_Chars;
+        TChar* f_Chars;
 
         #pragma endregion
 
@@ -170,7 +173,7 @@ namespace rookxx::strings
         {
             TChar* iptr;
             char* optr;
-            TChar* cstr;
+            char* cstr;
             // Allocate memory
             len = f_Length;
             cstr = new char[len + 1];
@@ -192,10 +195,46 @@ namespace rookxx::strings
             // Handle null characters
             if (nullCount > 0)
             {
-                // TODO: Handle
+                switch (option)
+                {
+                    case CStrOption::TruncateNull:
+                        {
+                            // Reallocate
+                            delete[] cstr;
+                            len = nullFirst;
+                            cstr = new char[len + 1];
+                            // Reset pointers
+                            iptr = f_Chars;
+                            optr = cstr;
+                            // Loop
+                            for (TLen i = 0; i < len; ++i)
+                                *(optr++) = (char)*(iptr++);
+                        }
+                        break;
+                    case CStrOption::RemoveNull:
+                        {
+                            // Reallocate
+                            delete[] cstr;
+                            len = f_Length - nullCount;
+                            cstr = new char[len + 1];
+                            // Reset pointers
+                            iptr = f_Chars;
+                            optr = cstr;
+                            // Loop
+                            for (TLen i = 0; i < f_Length; ++i)
+                            {
+                                if (*iptr != 0)
+                                    *(optr++) = (char)*iptr;
+                                ++iptr;
+                            }
+                        }
+                        break;
+                }
             }
             // Add null terminating character
             *optr = 0;
+            // Return
+            return cstr;
         }
 
         /// @brief 
@@ -210,9 +249,11 @@ namespace rookxx::strings
         char* toCStr(CStrOption option = CStrOption::TruncateNull) const
         {
             TLen len;
-            return toCStr(len, keepNullChars);
+            return toCStr(len, option);
         }
 
         #pragma endregion
     };
 }
+
+#endif

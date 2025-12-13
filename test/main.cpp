@@ -1,7 +1,13 @@
 #include <iostream>
 
+#include "strings/String8.h"
+
 int main(int argc, char** argv)
 {
-    std::cout << "Hello World" << std::endl;
+    rookxx::strings::String8 str("Hello world!!!");
+    for (size_t i = 0; i < str.length(); ++i)
+        std::cout << str.get(i);
+    std::cout << std::endl;
+
     return 0;
 }
