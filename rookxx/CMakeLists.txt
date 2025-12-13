@@ -4,15 +4,16 @@ project(rookxx VERSION 1.0.0.0
     DESCRIPTION "rookxx by Black Rook Games"
     LANGUAGES CXX)
 
+cmake_path(ABSOLUTE_PATH CMAKE_SOURCE_DIR OUTPUT_VARIABLE cmakedir)
+
 if(WIN32)
     message("Detected Windows")
-    # set(exeOptions "WIN32")
+    add_compile_definitions(__OS_WIN32__)
 elseif(UNIX)
     message("Detected Unix")
-    # set(exeOptions "")
+    add_compile_definitions(__OS_UNIX__)
 else()
     message("Unknown OS")
-    # set(exeOptions "")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -21,69 +22,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
-set(src )
+set(src_src )
 
-set(dir "")
-set(src ${src} 
-    hdr${dir}/Items.h)
+file(GLOB_RECURSE src_hdr "hdr/*.h")
+file(GLOB_RECURSE src_src_pool "src/*.cpp")
+foreach (path ${src_src_pool})
+    file(RELATIVE_PATH relpath ${cmakedir} ${path})
+    if (NOT ${relpath} IN_LIST src_src)
+        set(src_src ${src_src} ${relpath})
+    endif()
+endforeach()
 
-set(dir /bitman)
-set(src ${src} 
-    hdr${dir}/BitPnt.h src${dir}/BitPnt.cpp 
-    hdr${dir}/BitPtr.h src${dir}/BitPtr.cpp 
-    hdr${dir}/BPtr.h
-    hdr${dir}/ConstBitPnt.h src${dir}/ConstBitPnt.cpp 
-    hdr${dir}/ConstBitPtr.h src${dir}/ConstBitPtr.cpp)
-
-set(dir /collection)
-set(src ${src} 
-    hdr${dir}/AttachableList.h
-    hdr${dir}/AttachableListConstIterator.h
-    hdr${dir}/AttachableListIterator.h)
-
-set(dir /collection/voidptr)
-set(src ${src} 
-    hdr${dir}/VoidPtrConstIterator.h src${dir}/VoidPtrConstIterator.cpp 
-    hdr${dir}/VoidPtrIterator.h src${dir}/VoidPtrIterator.cpp 
-    hdr${dir}/VoidPtrList.h src${dir}/VoidPtrList.cpp 
-    hdr${dir}/VoidPtrListConstIterator.h src${dir}/VoidPtrListConstIterator.cpp 
-    hdr${dir}/VoidPtrListIterator.h src${dir}/VoidPtrListIterator.cpp 
-    hdr${dir}/VoidPtrQueue.h src${dir}/VoidPtrQueue.cpp 
-    hdr${dir}/VoidPtrSegCol.h src${dir}/VoidPtrSegCol.cpp 
-    hdr${dir}/VoidPtrSegColConstIterator.h src${dir}/VoidPtrSegColConstIterator.cpp 
-    hdr${dir}/VoidPtrSegColIterator.h src${dir}/VoidPtrSegColIterator.cpp 
-    hdr${dir}/VoidPtrSegColSegment.h src${dir}/VoidPtrSegColSegment.cpp 
-    hdr${dir}/VoidPtrStack.h src${dir}/VoidPtrStack.cpp)
-
-set(dir /ramen)
-set(src ${src} 
-    hdr${dir}/ArrUtil.h
-    hdr${dir}/DataReader.h src${dir}/DataReader.cpp
-    hdr${dir}/DataWriter.h src${dir}/DataWriter.cpp
-    hdr${dir}/Serializable.h
-    hdr${dir}/SmartReader.h src${dir}/SmartReader.cpp
-    hdr${dir}/SmartSerializable.h
-    hdr${dir}/SmartWriter.h src${dir}/SmartWriter.cpp
-    hdr${dir}/String8.h src${dir}/String8.cpp
-    hdr${dir}/String16.h src${dir}/String16.cpp
-    hdr${dir}/StringTemplate.h)
-
-set(dir /ramen/datcol)
-set(src ${src} 
-    hdr${dir}/DataCollection.h src${dir}/DataCollection.cpp
-    hdr${dir}/DataCollectionDirectory.h src${dir}/DataCollectionDirectory.cpp
-    hdr${dir}/DataCollectionFile.h src${dir}/DataCollectionFile.cpp
-    hdr${dir}/DataCollectionItem.h src${dir}/DataCollectionItem.cpp)
-
-set(dir /ramen/huffman)
-set(src ${src} 
-    hdr${dir}/HuffmanLeaf.h src${dir}/HuffmanLeaf.cpp
-    hdr${dir}/HuffmanNode.h src${dir}/HuffmanNode.cpp
-    hdr${dir}/HuffmanNodeType.h
-    hdr${dir}/HuffmanParent.h src${dir}/HuffmanParent.cpp
-    hdr${dir}/HuffmanTree.h src${dir}/HuffmanTree.cpp
-    hdr${dir}/HuffmanTree_SAn.h src${dir}/HuffmanTree_SAn.cpp
-    hdr${dir}/HuffmanUtility.h src${dir}/HuffmanUtility.cpp)
-
-add_library(rookxx SHARED ${src})
+add_library(rookxx SHARED ${src_src} ${src_hdr})
 target_include_directories(rookxx PUBLIC hdr)

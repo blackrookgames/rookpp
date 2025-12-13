@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/zac21/BlackRookGames/github/rookpp/rookxx/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -D__OS_WIN32__ -Drookxx_EXPORTS @CMakeFiles/rookxx.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\rookxx.dir\\src\\test.cpp.obj -c C:\\Users\\zac21\\BlackRookGames\\github\\rookpp\\rookxx\\src\\test.cpp",
+  "file": "C:/Users/zac21/BlackRookGames/github/rookpp/rookxx/src/test.cpp",
+  "output": "CMakeFiles/rookxx.dir/src/test.cpp.obj"
+}
+]
