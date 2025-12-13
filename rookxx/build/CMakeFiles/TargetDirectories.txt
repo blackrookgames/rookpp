@@ -1,3 +1,0 @@
-C:/Users/zac21/BlackRookGames/github/rookpp/rookxx/build/CMakeFiles/rookxx.dir
-C:/Users/zac21/BlackRookGames/github/rookpp/rookxx/build/CMakeFiles/edit_cache.dir
-C:/Users/zac21/BlackRookGames/github/rookpp/rookxx/build/CMakeFiles/rebuild_cache.dir
