@@ -15,7 +15,7 @@ namespace rookxx::strings
         #pragma region nested
 
     public:
-        typedef StringTemplate<uint8_t, size_t>::CStrOption CStrOption;
+        typedef StringTemplate<uint8_t, size_t>::CStrNullOption CStrNullOption;
 
         #pragma endregion
 
